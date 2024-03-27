@@ -1,6 +1,5 @@
+using System.Net.NetworkInformation;
 using UnityEngine;
-using System.Collections;
-using Unity.VisualScripting;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -22,9 +21,12 @@ public class MapGenerator : MonoBehaviour
     public bool autoUpdate;
 
     public TerrainType[] regions;
+    public LandType[] colors;
 
     int mapWidth;
     int mapHeight;
+
+    System.Random prng;
 
 
     public void GenerateMap()
@@ -45,8 +47,10 @@ public class MapGenerator : MonoBehaviour
                 {
                     if(currentHeight <= regions[i].height)
                     {
+                        
                         colorMap[y * mapWidth + x] = regions[i].color;
                         break;
+
                     }
                 }
             }
@@ -84,6 +88,14 @@ public class MapGenerator : MonoBehaviour
 
 [System.Serializable]
 public struct TerrainType
+{
+    public string name;
+    public float height;
+    public Color color;
+}
+
+[System.Serializable]
+public struct LandType
 {
     public string name;
     public float height;

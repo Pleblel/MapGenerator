@@ -1,18 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public class FallofMapGenerator : MonoBehaviour
+public class FalloffMapGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static float[,] GenerateFalloffMap(int size)
     {
-        
-    }
+        float[,] map = new float[size, size];
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                float x = i / (float)size * 2 - 1;
+                float y = j / (float)size * 2 - 1;
+                float r = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2));
+
+                float value = Mathf.Max(Mathf.Abs(r * 2), Mathf.Abs(r * 2));
+                map[i, j] = value;
+            }
+        }
+
+        return map;
     }
 }
