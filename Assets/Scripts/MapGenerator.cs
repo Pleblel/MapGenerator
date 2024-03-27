@@ -1,10 +1,9 @@
-using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
 
-    public enum DrawMode{NoiseMap, ColorMap, FalloffMap};
+    public enum DrawMode{NoiseMap, ColorMap, FalloffMap, GrassNoise};
     public DrawMode drawMode;
 
     public int size;
@@ -16,6 +15,7 @@ public class MapGenerator : MonoBehaviour
     public float falloffPersistance;
     public float lacunarity;
     public int seed;
+    public int grassSeed;
     public Vector2 offset;
 
     public bool autoUpdate;
@@ -26,14 +26,21 @@ public class MapGenerator : MonoBehaviour
     int mapWidth;
     int mapHeight;
 
-    System.Random prng;
 
-
-    public void GenerateMap()
+    public void GenerateMap(int randSeed, int grassRandSeed)
     {
+        if(randSeed != 100001)
+        {
+            seed = randSeed;
+        }
+        if (grassRandSeed != 100001)
+        {
+            grassSeed = grassRandSeed;
+        }
         mapWidth = size;
         mapHeight = mapWidth;
         float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        float[,] grassNoiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, grassSeed, noiseScale, octaves, persistance, lacunarity, offset);
         float[,] falloffMap = FalloffMapGenerator.GenerateFalloffMap(mapWidth);
 
         Color[] colorMap = new Color[mapWidth * mapHeight];
@@ -42,15 +49,31 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < mapWidth; x++)
             {
                 noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - (falloffMap[x, y] * falloffPersistance));
+                grassNoiseMap[x, y] = Mathf.Clamp01(grassNoiseMap[x,y]);
                 float currentHeight = noiseMap[x, y];
+                float currentGrassHeight = grassNoiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++)
                 {
                     if(currentHeight <= regions[i].height)
                     {
-                        
-                        colorMap[y * mapWidth + x] = regions[i].color;
+                        if (regions[i].name == "Land")
+                        {
+                            for (int j = 0; j < colors.Length; j++)
+                            {
+                                
+                                if (currentGrassHeight <= colors[j].height)
+                                {
+                                    colorMap[y * mapWidth + x] = colors[j].color;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            colorMap[y * mapWidth+ x] = regions[i].color;
+                           
+                        }
                         break;
-
                     }
                 }
             }
@@ -67,6 +90,10 @@ public class MapGenerator : MonoBehaviour
         else if (drawMode == DrawMode.FalloffMap)
         {
             display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffMapGenerator.GenerateFalloffMap(mapWidth)));
+        }
+        else if (drawMode == DrawMode.GrassNoise)
+        {
+            display.DrawTexture(TextureGenerator.TextureFromHeightMap(grassNoiseMap));
         }
     }
     private void OnValidate()
