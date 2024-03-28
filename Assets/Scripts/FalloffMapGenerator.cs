@@ -15,7 +15,7 @@ public class FalloffMapGenerator : MonoBehaviour
                 float y = j / (float)size * 2 - 1;
                 float r = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(y, 2));
 
-                float value = Mathf.Max(Mathf.Abs(r), Mathf.Abs(r));
+                float value = Mathf.Max(Mathf.Abs(r * 2), Mathf.Abs(r * 2));
                 map[i, j] = value;
             }
         }
