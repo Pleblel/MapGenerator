@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-
+    //Modes to draw map
     public enum DrawMode{NoiseMap, ColorMap, FalloffMap, GrassNoise};
     public DrawMode drawMode;
 
+    //Noise settings
     public int size;
     public float noiseScale;
     public int octaves;
@@ -20,6 +21,7 @@ public class MapGenerator : MonoBehaviour
 
     public bool autoUpdate;
 
+    //Map settings
     public TerrainType[] regions;
     public LandType[] colors;
 
@@ -53,20 +55,23 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < mapWidth; x++)
             {
 
-
+                //Puts the noisemaps 2D array between 1 and 0 and makes it blend with the falloff map
                 noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - (falloffMap[x, y] * falloffPersistance));
                 grassNoiseMap[x, y] = Mathf.Clamp01(grassNoiseMap[x,y]);
                 float currentHeight = noiseMap[x, y];
                 float currentGrassHeight = grassNoiseMap[x, y];
+
+                //Loops through all regions and checks what color it falls into
                 for (int i = 0; i < regions.Length; i++)
                 {
                     if(currentHeight <= regions[i].height)
                     {
+
+                        //Does the same but if it is grass it uses another map to get grass color
                         if (regions[i].name == "Land")
                         {
                             for (int j = 0; j < colors.Length; j++)
                             {
-                                
                                 if (currentGrassHeight <= colors[j].height)
                                 {
                                     colorMap[y * mapWidth + x] = colors[j].color;
@@ -74,6 +79,8 @@ public class MapGenerator : MonoBehaviour
                                 }
                             }
                         }
+
+                        //Sets color to the coresponding color
                         else
                         {
                             colorMap[y * mapWidth+ x] = regions[i].color;
@@ -85,6 +92,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
+        //All the different modes to draw the map
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap)
         {
@@ -102,6 +110,8 @@ public class MapGenerator : MonoBehaviour
             display.DrawTexture(TextureGenerator.TextureFromHeightMap(grassNoiseMap));
         }
     }
+
+    //Limit ranges on some variabvles
     private void OnValidate()
     {
         if(size < 1)
@@ -119,6 +129,8 @@ public class MapGenerator : MonoBehaviour
     }
 }
 
+
+//Structs with info on the regions names and colors
 [System.Serializable]
 public struct TerrainType
 {

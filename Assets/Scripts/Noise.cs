@@ -20,7 +20,7 @@ public static class Noise
 
         //Creates a max and min value for the noises height
         float maxNoiseHeight = float.MinValue;
-        float minNoiseHeiight = float.MaxValue;
+        float minNoiseHeight = float.MaxValue;
 
         //Gets middle of the map
         float halfWidth = mapWidth / 2;
@@ -56,9 +56,9 @@ public static class Noise
                 {
                     maxNoiseHeight = noiseHeight;
                 }
-                else if(noiseHeight < minNoiseHeiight)
+                else if(noiseHeight < minNoiseHeight)
                 {
-                    minNoiseHeiight = noiseHeight;
+                    minNoiseHeight = noiseHeight;
                 }
                 noiseMap[x, y] = noiseHeight;
             }
@@ -69,7 +69,7 @@ public static class Noise
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeiight, maxNoiseHeight, noiseMap[x, y]);
+                noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
             }
         }
                 return noiseMap;
