@@ -26,9 +26,10 @@ public class MapGenerator : MonoBehaviour
     int mapWidth;
     int mapHeight;
 
-
     public void GenerateMap(int randSeed, int grassRandSeed)
     {
+        
+        //Editor logic
         if(randSeed != 100001)
         {
             seed = randSeed;
@@ -37,17 +38,22 @@ public class MapGenerator : MonoBehaviour
         {
             grassSeed = grassRandSeed;
         }
+
+        //All types of map
         mapWidth = size;
         mapHeight = mapWidth;
         float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
         float[,] grassNoiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, grassSeed, noiseScale, octaves, persistance, lacunarity, offset);
         float[,] falloffMap = FalloffMapGenerator.GenerateFalloffMap(mapWidth);
 
+        //Creates color array and loops through pixels
         Color[] colorMap = new Color[mapWidth * mapHeight];
         for (int y = 0; y < mapHeight; y++)
         {
             for (int x = 0; x < mapWidth; x++)
             {
+
+
                 noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - (falloffMap[x, y] * falloffPersistance));
                 grassNoiseMap[x, y] = Mathf.Clamp01(grassNoiseMap[x,y]);
                 float currentHeight = noiseMap[x, y];
